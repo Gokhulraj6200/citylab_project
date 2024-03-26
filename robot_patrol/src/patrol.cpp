@@ -31,9 +31,9 @@ private:
         int max_index = 0; 
         float max_obj = 0;
         int size = static_cast<int>(msg->ranges.size());
-        float front = msg->ranges[330];
-        float left = msg->ranges[165];
-        float right = msg->ranges[495];
+        float front = msg->ranges[size * 0.5];
+        float left = msg->ranges[size * 0.25];
+        float right = msg->ranges[size * 0.75];
         float max_range = msg->range_max;
         float direction_;
         RCLCPP_INFO(this->get_logger(), "The laser scans array has a size of: %i", size);
@@ -51,7 +51,8 @@ private:
            direction_ = max_index * 2 * pi_ / size;
            RCLCPP_INFO(this->get_logger(), "The max object is: %.2f and index is: %i", max_obj , max_index);
            auto velocity = geometry_msgs::msg::Twist();
-            if (front >= 0.5) {
+           /* code logic for simulation*/
+           if (front >= 0.5) {
                 RCLCPP_INFO(this->get_logger(), "robot moves forward");
                 velocity.linear.x = -0.1;
                 publisher_->publish(velocity);
@@ -59,21 +60,48 @@ private:
             }
             else {
 
-            if (max_index > 330){
+             if (max_index > 330){
                 RCLCPP_INFO(this->get_logger(), "robot rotates counterclockwise");
                 velocity.linear.x = 0;
                 velocity.angular.z = direction_/2;
                 publisher_->publish(velocity);
-            }
-            else {
-            {
+               }
+             else 
+               {
                 RCLCPP_INFO(this->get_logger(), "robot rotates clockwise");
                 velocity.linear.x = 0;
                 velocity.angular.z = -direction_/2;
                 publisher_->publish(velocity);
+               }
             }
-            }
-            }
+           /* code logic for real robot */
+           // if (front >= 0.65) {
+           //     if(right <0.25 ){ velocity.angular.z = -0.05;
+           //     publisher_->publish(velocity);}
+           //     else if(left <0.25){ velocity.angular.z = 0.05;
+           //     publisher_->publish(velocity);}
+           //     RCLCPP_INFO(this->get_logger(), "robot moves forward");
+           //     velocity.linear.x = 0.1;
+           //     publisher_->publish(velocity);
+                
+           // }
+           // else {
+
+           // if (max_index > size * 0.5){
+           //     RCLCPP_INFO(this->get_logger(), "robot rotates counterclockwise");
+           //     velocity.linear.x = 0;
+           //     velocity.angular.z = direction_/2;
+           //     publisher_->publish(velocity);
+           // }
+           // else 
+           // {
+           //     RCLCPP_INFO(this->get_logger(), "robot rotates clockwise");
+           //     velocity.linear.x = 0;
+           //     velocity.angular.z = -direction_/2;
+           //     publisher_->publish(velocity);
+           // }
+            
+           // }
             
 
      }
