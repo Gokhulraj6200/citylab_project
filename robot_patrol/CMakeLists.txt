@@ -8,8 +8,13 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(custominterface REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+find_package(robot_patrol REQUIRED)
+find_package(custominterface REQUIRED)
+
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -23,18 +28,27 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-add_executable(patrol_node src/patrol.cpp)
-ament_target_dependencies(patrol_node rclcpp geometry_msgs sensor_msgs)
+# Excecutables
+add_executable(patrol src/patrol.cpp)
+add_executable(direction_server_node src/direction_service.cpp)
+add_executable(test_service_node src/test_service.cpp)
 
-install(TARGETS
-   patrol_node
-   DESTINATION lib/${PROJECT_NAME}
- )
+# Target dependencies
+ament_target_dependencies(patrol rclcpp sensor_msgs geometry_msgs)
+ament_target_dependencies(direction_server_node rclcpp robot_patrol custominterface)
+ament_target_dependencies(test_service_node rclcpp robot_patrol sensor_msgs custominterface)
 
-# Install launch files.
+# Install targets
+install(TARGETS patrol DESTINATION lib/${PROJECT_NAME})
+install(TARGETS direction_server_node DESTINATION lib/${PROJECT_NAME})
+install(TARGETS test_service_node DESTINATION lib/${PROJECT_NAME})
+
 install(DIRECTORY
   launch
   DESTINATION share/${PROJECT_NAME}/
 )
+
+# Export dependencies
+ament_export_dependencies(ament_cmake rclcpp sensor_msgs geometry_msgs) 
 
 ament_package()
