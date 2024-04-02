@@ -42,7 +42,7 @@ private:
         RCLCPP_INFO(this->get_logger(), "The front laser is: %.2f", front);
         RCLCPP_INFO(this->get_logger(), "The left laser is: %.2f", left);
         RCLCPP_INFO(this->get_logger(), "The right laser is: %.2f", right);
-
+        /* code logic for simulation*/
         for(int i = 0; i < size; i++){
                 if (msg->ranges[i] < max_range && msg->ranges[i] > max_obj)
                 {
@@ -58,7 +58,6 @@ private:
         direction_ = max_index * 2 * pi_ / size;
         RCLCPP_INFO(this->get_logger(), "The max object is: %.2f and index is: %i", max_obj , max_index);
         auto velocity = geometry_msgs::msg::Twist();
-        /* code logic for simulation*/
         
         if (edge_val > 0.4 && msg->ranges[0] > 0.8) {
             RCLCPP_INFO(this->get_logger(), "robot moves forward");
@@ -79,37 +78,49 @@ private:
             publisher_->publish(velocity);
         }
             
-           /* code logic for real robot */
-           // if (front >= 0.65) {
-           //     if(right <0.25 ){ velocity.angular.z = -0.05;
-           //     publisher_->publish(velocity);}
-           //     else if(left <0.25){ velocity.angular.z = 0.05;
-           //     publisher_->publish(velocity);}
-           //     RCLCPP_INFO(this->get_logger(), "robot moves forward");
-           //     velocity.linear.x = 0.1;
-           //     publisher_->publish(velocity);
+        /* code logic for real robot */
+        
+    //     for(int i = 0; i < size; i++)
+    //     {
+    //         if (msg->ranges[i] < max_range && msg->ranges[i] > max_obj)
+    //             {
+    //                 max_obj = msg->ranges[i];
+    //                 max_index = i;
+    //             }
+    //     }
+    //        direction_ = max_index * 2 * pi_ / size;
+    //        RCLCPP_INFO(this->get_logger(), "The max object is: %.2f and index is: %i", max_obj , max_index);
+    //        auto velocity = geometry_msgs::msg::Twist();
+    //        if (front >= 0.65) {
+    //            if(right <0.25 ){ velocity.angular.z = -0.05;
+    //            publisher_->publish(velocity);}
+    //            else if(left <0.25){ velocity.angular.z = 0.05;
+    //            publisher_->publish(velocity);}
+    //            RCLCPP_INFO(this->get_logger(), "robot moves forward");
+    //            velocity.linear.x = 0.1;
+    //            publisher_->publish(velocity);
                 
-           // }
-           // else {
+    //        }
+    //        else {
 
-           // if (max_index > size * 0.5){
-           //     RCLCPP_INFO(this->get_logger(), "robot rotates counterclockwise");
-           //     velocity.linear.x = 0;
-           //     velocity.angular.z = direction_/2;
-           //     publisher_->publish(velocity);
-           // }
-           // else 
-           // {
-           //     RCLCPP_INFO(this->get_logger(), "robot rotates clockwise");
-           //     velocity.linear.x = 0;
-           //     velocity.angular.z = -direction_/2;
-           //     publisher_->publish(velocity);
-           // }
+    //        if (max_index > size * 0.5){
+    //            RCLCPP_INFO(this->get_logger(), "robot rotates counterclockwise");
+    //            velocity.linear.x = 0;
+    //            velocity.angular.z = direction_/2;
+    //            publisher_->publish(velocity);
+    //        }
+    //        else 
+    //        {
+    //            RCLCPP_INFO(this->get_logger(), "robot rotates clockwise");
+    //            velocity.linear.x = 0;
+    //            velocity.angular.z = -direction_/2;
+    //            publisher_->publish(velocity);
+    //        }
             
-           // }
+    //        }
             
 
-     }
+    //  }
 
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr subscription_;

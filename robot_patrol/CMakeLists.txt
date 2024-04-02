@@ -29,17 +29,17 @@ if(BUILD_TESTING)
 endif()
 
 # Excecutables
-add_executable(patrol src/patrol.cpp)
+add_executable(patrol_node src/patrol_with_service.cpp)
 add_executable(direction_server_node src/direction_service.cpp)
 add_executable(test_service_node src/test_service.cpp)
 
 # Target dependencies
-ament_target_dependencies(patrol rclcpp sensor_msgs geometry_msgs)
+ament_target_dependencies(patrol_node rclcpp sensor_msgs geometry_msgs custominterface)
 ament_target_dependencies(direction_server_node rclcpp robot_patrol custominterface)
 ament_target_dependencies(test_service_node rclcpp robot_patrol sensor_msgs custominterface)
 
 # Install targets
-install(TARGETS patrol DESTINATION lib/${PROJECT_NAME})
+install(TARGETS patrol_node DESTINATION lib/${PROJECT_NAME})
 install(TARGETS direction_server_node DESTINATION lib/${PROJECT_NAME})
 install(TARGETS test_service_node DESTINATION lib/${PROJECT_NAME})
 
