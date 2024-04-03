@@ -4,13 +4,13 @@
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/service.hpp"
 #include "rclcpp/utilities.hpp"
-#include <cstddef>
-#include <custominterface/srv/get_direction.hpp>
+#include "custominterface/srv/get_direction.hpp"
 #include <functional>
 #include <memory>
 #include <cstdlib>
 #include <stdexcept>
 #include <string>
+#include <iostream>
 
 using GetDirection = custominterface::srv::GetDirection;
 using std::placeholders::_1;
@@ -18,45 +18,45 @@ using std::placeholders::_2;
 
 class DirectionService : public rclcpp::Node {
 public:
-  DirectionService() : Node("direction_server_node") {
-
-    srv_ = create_service<GetDirection>(
-        "/direction_service",
-        std::bind(&DirectionService::handle_service, this, _1, _2));
-  }
+    DirectionService() : rclcpp::Node::Node("direction_server_node") {
+        
+        srv_ = this->create_service<GetDirection>(
+            "/direction_service", 
+            std::bind(&DirectionService::handle_service, this, _1, _2));
+    }
+       
 private:
-    
-   rclcpp::Service<GetDirection>::SharedPtr srv_;
-   // for simulation
+
+    rclcpp::Service<GetDirection>::SharedPtr srv_;
+    // for simulation
     void handle_service(const std::shared_ptr<GetDirection::Request> request, 
-                              std::shared_ptr<GetDirection::Response> response) 
+                            std::shared_ptr<GetDirection::Response> response) 
     {
         float total_dist_sec_right = 0;
         float total_dist_sec_front = 0;
         float total_dist_sec_left = 0;
-        size_t index = request->laser_data.ranges.size() * 0.75;
+        int size = request->laser_data.ranges.size();
+        int index = size * 0.75;
         float range_max = request->laser_data.range_max;
-        for (size_t i = 0; i < request->laser_data.ranges.size()/2; ++i) {
-            if ((i < request->laser_data.ranges.size()/6 ) && (request->laser_data.ranges[index] <= range_max)) {
+        int rsize = size / 2;
+        for (int i = 0; i < rsize; i++) {
+            if ((i < rsize / 3) && (request->laser_data.ranges[index] <= range_max)) {
                 total_dist_sec_right += request->laser_data.ranges[index];
             }
-            else if ((i < request->laser_data.ranges.size() / 3) && (request->laser_data.ranges[index] <= range_max)) {
+            else if ((i < 2 * rsize / 3) && (request->laser_data.ranges[index] <= range_max)) {
                 total_dist_sec_front += request->laser_data.ranges[index];
             }
-            else if ((i >= request->laser_data.ranges.size()/ 3) && (request->laser_data.ranges[index] <= range_max)) {
+            else if ((i >= 2 * rsize / 3) && (request->laser_data.ranges[index] <= range_max)) {
                 total_dist_sec_left += request->laser_data.ranges[index];
             }
             index++;
-            if (index >= request->laser_data.ranges.size()) 
-            {
-              index = 0;
-              }
+            if (index >= size) {index = 0;}
         }
         if ((total_dist_sec_right > total_dist_sec_front) && (total_dist_sec_right > total_dist_sec_left)) {
-            response->direction = "turn right";
+            response->direction = "right";
         }
         else {
-            response->direction = total_dist_sec_front > total_dist_sec_left ? "move forward" : "turn left";
+            response->direction = total_dist_sec_front > total_dist_sec_left ? "forward" : "left";
         }
     }
 
@@ -101,12 +101,12 @@ private:
 //       }
 //     }
 //     }
-
 };
 
-int main(int argc, char **argv) {
-  rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<DirectionService>());
-  rclcpp::shutdown();
-  return 0;
+int main(int argc, char ** argv) {
+    rclcpp::init(argc, argv);
+    auto node = std::make_shared<DirectionService>();
+    rclcpp::spin(node);
+    rclcpp::shutdown();
+    return 0;
 }
